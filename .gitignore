@@ -1,0 +1,15 @@
+.tags
+*~
+bin
+build
+lib
+*.user
+*.pcd
+3dmesh
+ceres-solver-test
+.excludes
+*.json
+*.18
+*-pre1
+latex
+doc
