@@ -19,14 +19,20 @@ public:
     ~InverseCompound3D();
 
     /*!
-     * \brief Evaluate
+     * \brief Evaluate the cost function and its jacobians with the given parameters
      * \param parameters
-     * \param residuals
-     * \param jacobians
-     * \return
+     * \param[out] residuals
+     * \param[out] jacobians
+     * \return ture/false if the residuals and the jacobians have been properly evaluated.
      */
     bool Evaluate(double const* const* parameters, double* residuals, double** jacobians) const;
 
+    /*!
+     * \brief operator() evaluates the cost function for the given parameter.
+     * \param parameter
+     * \param[out] residuals xi = (-) parameter
+     * \return ture/false if the residuals and the jacobians have been properly evaluated.
+     */
     template<typename T>
     bool operator()(const T* const parameter, T* residuals) const
     {

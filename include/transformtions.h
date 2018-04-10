@@ -4,6 +4,12 @@
 #include <Eigen/Core>
 #include <exception>
 
+/**
+ * \defgroup TRANSFORMATIONS Transformation implementation of the transformation and its derivatives.
+ *
+ * \{
+ */
+
 /*!
  * \brief Angle between two quaternions. Implemented from <a link="https://math.stackexchange.com/questions/90081/quaternion-distance">Quaternion distance</a>
  */
@@ -393,5 +399,5 @@ Eigen::Matrix<T,6,6> inverseCompound3DJacobian(const Eigen::Matrix<T,6,1>& x)
     // Exit
     return J;
 }
-
+/** \} */
 #endif // TRANSFORMATIONS_H

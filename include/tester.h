@@ -4,16 +4,25 @@
 #include <ceres/ceres.h>
 #include "functions.h"
 
-enum{
-    DISPLAY_NONE,
-    DISPLAY_ERROR,
-    DISPLAY_ALL
-};
-
+/*!
+ * Tester class for Compound3D and InverseCompound3D
+ */
 template<typename CostFunctionToProbe, int M = 0, int N0 = 0, int N1 = 0>
 class Tester{
 public:
 
+    /*!
+     * Display mode for the Tester class.
+     */
+    enum{
+        DISPLAY_NONE,
+        DISPLAY_ERROR,
+        DISPLAY_ALL
+    };
+
+    /*!
+     * \brief Constructor
+     */
     Tester()
     {
         // Allocate residuals
@@ -66,8 +75,26 @@ public:
 
     ~Tester()
     {
+        for (int i = 0;i<parameters_size_.size();i++)
+        {
+            delete[] parameters_[i];
+            delete[] jacobians_analytic_[i];
+            delete[] jacobians_automatic_[i];
+        }
+        delete[] jacobians_analytic_;
+        delete[] jacobians_automatic_;
+        delete[] parameters_;
+        delete cost_function_;
+        delete func_;
     }
 
+    /*!
+     * \brief test
+     * \param iterations
+     * \param max_error
+     * \param display
+     * \return
+     */
     int test(int iterations, double max_error, int display = DISPLAY_ERROR)
     {
         int n_errors(0);
@@ -152,26 +179,78 @@ public:
                     error_percentage_[j](rw,cl) = error_percentage_[j](rw,cl)/n_errors;
                 }
             }
-            std::cout<<"Error per cell:\n"<<error_percentage_[j]<<std::endl;
+            std::cout<<"Error per cell ("<<j<<"):\n"<<error_percentage_[j]<<std::endl;
         }
 
         return n_errors;
     }
 
 protected:
+
+    /*!
+     * \brief parameters to be evaluated in the cost functions.
+     */
     double** parameters_;
+
+    /*!
+     * \brief resutls of evaluating the cost function.
+     */
     double* residuals_;
+
+    /*!
+     * \brief Jacobians computed using automatic differentiation from ceres.
+     */
     double** jacobians_automatic_;
+
+    /*!
+     * \brief Jacobians computed usng analytic differentiation.
+     */
     double** jacobians_analytic_;
+
+    /*!
+     * \brief Size of residual block.
+     */
     int num_residuals;
+
+    /*!
+     * \brief Size of each parameter.
+     */
     std::vector<int> parameters_size_;
+
+    /*!
+     * \brief Cost function to compute the automatic differentiation.
+     */
     ceres::CostFunction* cost_function_;
+
+    /*!
+     * \brief Function to compute the analytic differentiation.
+     */
     ceres::CostFunction* func_;
+
+    /*!
+     * \brief List of jacobians computed with automatic differentiation.
+     */
     std::vector<ceres::Matrix> J_autodiff_;
-    ceres::Matrix r_;
-    ceres::Matrix p_;
+
+    /*!
+     * \brief List of jacobians computed with analytic differentiation.
+     */
     std::vector<ceres::Matrix> J_analytic_;
+
+    /*!
+     * \brief Error for each element of the jacobians.
+     */
     std::vector<ceres::Matrix> error_percentage_;
+
+    /*!
+     * \brief Residual expressed as a matrix (for easier display).
+     */
+    ceres::Matrix r_;
+
+    /*!
+     * \brief Parameters expressed as a matrix (for easier display).
+     */
+    ceres::Matrix p_;
 };
 
 #endif // TESTER_H
