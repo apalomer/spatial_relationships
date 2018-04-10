@@ -181,7 +181,6 @@ void compound3DJacobian(const Eigen::Matrix<T,6,1>& x1, const Eigen::Matrix<T,6,
     T t2z = t2(2,0);
     T t2roll = rpy2(0,0);
     T t2pitch = rpy2(1,0);
-    T t2yaw = rpy2(2,0);
 
     // Compute composition
     Eigen::Matrix<T,3,1> t3;
@@ -200,9 +199,6 @@ void compound3DJacobian(const Eigen::Matrix<T,6,1>& x1, const Eigen::Matrix<T,6,
 
     // Rotation Matrix
     Eigen::Matrix<T,3,3> R1 = mrot(rpy1);
-    T n1x = R1(0,0);
-    T n1y = R1(1,0);
-    T n1z = R1(2,0);
     T o1x = R1(0,1);
     T o1y = R1(1,1);
     T o1z = R1(2,1);
@@ -210,22 +206,15 @@ void compound3DJacobian(const Eigen::Matrix<T,6,1>& x1, const Eigen::Matrix<T,6,
     T a1y = R1(1,2);
     T a1z = R1(2,2);
     Eigen::Matrix<T,3,3> R2 = mrot(rpy2);
-    T n2x = R2(0,0);
-    T n2y = R2(1,0);
-    T n2z = R2(2,0);
     T o2x = R2(0,1);
-    T o2y = R2(1,1);
-    T o2z = R2(2,1);
     T a2x = R2(0,2);
-    T a2y = R2(1,2);
-    T a2z = R2(2,2);
 
     // Top right block of J1
     Eigen::Matrix<T,3,3> M;
     M(0,0) = t2y *a1x - t2z*o1x;
     M(0,1) = (t3z - t1z)*cos(t1yaw);
     M(0,2) = t1y - t3y;
-    M(1,0) = t2y*a1y - t2z*o1z;
+    M(1,0) = t2y*a1y - t2z*o1y;
     M(1,1) = (t3z - t1z)*sin(t1yaw);
     M(1,2) = t3x - t1x;
     M(2,0) = t2y*a1z-t2z*o1z;
@@ -251,10 +240,10 @@ void compound3DJacobian(const Eigen::Matrix<T,6,1>& x1, const Eigen::Matrix<T,6,
     K2(0,2) = (a1x*cos(t3yaw)+a1y*sin(t3yaw))/cos(t3pitch);
     K2(1,0) = 0;
     K2(1,1) = cos(t3roll - t2roll);
-    K2(1,2) = -cos(t2pitch)*sin(t3yaw-t2yaw);
+    K2(1,2) = -cos(t2pitch)*sin(t3roll-t2roll);
     K2(2,0) = 0;
     K2(2,1) = sin(t3roll-t2roll)/cos(t3pitch);
-    K2(2,2) = cos(t2pitch)*cos(t3yaw-t2yaw)/cos(t3pitch);
+    K2(2,2) = cos(t2pitch)*cos(t3roll-t2roll)/cos(t3pitch);
 
     // Initialize Jacobians
     J1 = Eigen::Matrix<T,6,6>::Identity();
