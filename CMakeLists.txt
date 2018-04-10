@@ -23,7 +23,7 @@ set(CMAKE_SHARED_LIBRARY_SUFFIX .so)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
 
 # Ceres
-find_package(Ceres REQUIRED)
+find_package(Ceres)
 include_directories(${CERES_INCLUDE_DIR})
 
 # Eigen
