@@ -29,7 +29,7 @@ void usage(std::string exec_name)
     std::cout<<"  -c    test compounding (+) operation\n";
     std::cout<<"  -i    test inverse compounding (-) operation\n";
     std::cout<<"  -m    max error (default: "<<MAX_ERROR<<")\n";
-    std::cout<<"  -d    display level (default: "<<DISPLAY_LEVEL<<", available: all ("<<Tester<InverseCompound3D,6,6>::DISPLAY_ALL<<"), errors ("<<Tester<InverseCompound3D,6,6>::DISPLAY_ERROR<<") and none ("<<Tester<InverseCompound3D,6,6>::DISPLAY_NONE<<"))\n";
+    std::cout<<"  -d    display level (default: "<<DISPLAY_LEVEL<<", available: all ("<<Tester<InverseCompound3D,6,6>::DISPLAY_ALL<<"), all with numeric differentiation ("<<Tester<InverseCompound3D,6,6>::DISPLAY_ALL_AND_NUMERIC<<"), errors ("<<Tester<InverseCompound3D,6,6>::DISPLAY_ERROR<<"), errors with numeric differentiation ("<<Tester<InverseCompound3D,6,6>::DISPLAY_ERROR_AND_NUMERIC<<") and none ("<<Tester<InverseCompound3D,6,6>::DISPLAY_NONE<<"))\n";
     std::cout<<"  -n    number of tests (default: "<<ITERATIONS<<")\n";
 }
 
@@ -77,7 +77,9 @@ int main(int argc, char** argv)
             if (++i < argc)
             {
                 display_level = atoi(argv[i]);
-                if (display_level != Tester<InverseCompound3D,6,6>::DISPLAY_ALL && display_level != Tester<InverseCompound3D,6,6>::DISPLAY_ERROR && display_level != Tester<InverseCompound3D,6,6>::DISPLAY_NONE)
+                if (display_level != Tester<InverseCompound3D,6,6>::DISPLAY_ALL && display_level != Tester<InverseCompound3D,6,6>::DISPLAY_ERROR &&
+                    display_level != Tester<InverseCompound3D,6,6>::DISPLAY_NONE && display_level != Tester<InverseCompound3D,6,6>::DISPLAY_ALL_AND_NUMERIC &&
+                    display_level != Tester<InverseCompound3D,6,6>::DISPLAY_ERROR_AND_NUMERIC)
                 {
                     std::cout<<"Not recognized display option\n";
                     usage(argv[0]);

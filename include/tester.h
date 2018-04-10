@@ -17,7 +17,9 @@ public:
     enum{
         DISPLAY_NONE,
         DISPLAY_ERROR,
-        DISPLAY_ALL
+        DISPLAY_ERROR_AND_NUMERIC,
+        DISPLAY_ALL,
+        DISPLAY_ALL_AND_NUMERIC
     };
 
     /*!
@@ -44,6 +46,7 @@ public:
         parameters_ = new double*[parameters_size_.size()];
         jacobians_automatic_ = new double*[parameters_size_.size()];
         jacobians_analytic_ = new double*[parameters_size_.size()];
+        jacobians_numeric_ = new double*[parameters_size_.size()];
         for (int i = 0;i<parameters_size_.size();i++)
         {
             // Parameters
@@ -58,6 +61,10 @@ public:
             J_analytic.resize(num_residuals,parameters_size_[i]);
             J_analytic_.push_back(J_analytic);
             jacobians_analytic_[i] = new double[num_residuals*parameters_size_[i]];
+            ceres::Matrix J_numeric;
+            J_numeric.resize(num_residuals,parameters_size_[i]);
+            J_numeric_.push_back(J_numeric);
+            jacobians_numeric_[i] = new double[num_residuals*parameters_size_[i]];
             ceres::Matrix e;
             e.resize(num_residuals,parameters_size_[i]);
             for (int j = 0;j<num_residuals;j++)
@@ -69,7 +76,8 @@ public:
         }
 
         // Allocate cost functions
-        cost_function_ =  new ceres::AutoDiffCostFunction<CostFunctionToProbe,M,N0,N1>(new CostFunctionToProbe);
+        cost_function_automatic_ =  new ceres::AutoDiffCostFunction<CostFunctionToProbe,M,N0,N1>(new CostFunctionToProbe);
+        cost_function_numeric_ =  new ceres::NumericDiffCostFunction<CostFunctionToProbe, ceres::CENTRAL, M,N0,N1>(new CostFunctionToProbe);
         func_ = new CostFunctionToProbe;
     }
 
@@ -84,7 +92,8 @@ public:
         delete[] jacobians_analytic_;
         delete[] jacobians_automatic_;
         delete[] parameters_;
-        delete cost_function_;
+        delete cost_function_automatic_;
+        delete cost_function_numeric_;
         delete func_;
     }
 
@@ -109,7 +118,10 @@ public:
             }
 
             // Evaluate automatic
-            cost_function_->Evaluate(parameters_,residuals_,jacobians_automatic_);
+            cost_function_automatic_->Evaluate(parameters_,residuals_,jacobians_automatic_);
+
+            // Evaluate numeric
+            cost_function_numeric_->Evaluate(parameters_,residuals_,jacobians_numeric_);
 
             // Evaluate analytic
             func_->Evaluate(parameters_,residuals_,jacobians_analytic_);
@@ -121,19 +133,32 @@ public:
                 {
                     J_analytic_[j](k/parameters_size_[j],k%parameters_size_[j]) = jacobians_analytic_[j][k];
                     J_autodiff_[j](k/parameters_size_[j],k%parameters_size_[j]) = jacobians_automatic_[j][k];
+                    J_numeric_[j](k/parameters_size_[j],k%parameters_size_[j]) = jacobians_numeric_[j][k];
                 }
             }
 
             // Compute difference
             std::vector<ceres::Matrix> err;
             std::vector<double> tej;
+            std::vector<ceres::Matrix> err2;
+            std::vector<double> tej2;
+            std::vector<ceres::Matrix> err3;
+            std::vector<double> tej3;
             bool berr(false);
             for (int j = 0;j<parameters_size_.size();j++)
             {
                 ceres::Matrix e = J_analytic_[j] - J_autodiff_[j];
+                ceres::Matrix e2 = J_analytic_[j] - J_numeric_[j];
+                ceres::Matrix e3 = J_autodiff_[j] - J_numeric_[j];
                 err.push_back(e);
+                err2.push_back(e2);
+                err3.push_back(e3);
                 double aux = e.lpNorm<Eigen::Infinity>();
+                double aux2 = e2.lpNorm<Eigen::Infinity>();
+                double aux3 = e3.lpNorm<Eigen::Infinity>();
                 tej.push_back(aux);
+                tej2.push_back(aux2);
+                tej3.push_back(aux3);
                 if (!berr)
                 {
                     berr = aux > max_error;
@@ -155,15 +180,26 @@ public:
                 }
             }
 
-            if ((display == DISPLAY_ALL || (display == DISPLAY_ERROR && berr)) && display != DISPLAY_NONE)
+            if ((display == DISPLAY_ALL || display == DISPLAY_ALL_AND_NUMERIC ||
+                (display == DISPLAY_ERROR && berr) || (display == DISPLAY_ERROR_AND_NUMERIC && berr))
+                && display != DISPLAY_NONE)
             {
                 std::cout<<"++++++++++++++++\nTest "<<i<<std::endl;
                 std::cout<<"Evaluation:\n"<<r_.transpose()<<std::endl;
                 for (int j = 0;j<parameters_size_.size();j++)
                 {
+                    if (display == DISPLAY_ERROR_AND_NUMERIC || display == DISPLAY_ALL_AND_NUMERIC)
+                    {
+                        std::cout<<"Numeric diff ("<<j<<"):\n"<<J_numeric_[j]<<std::endl;
+                    }
                     std::cout<<"Analytic diff ("<<j<<"):\n"<<J_analytic_[j]<<std::endl;
                     std::cout<<"Automatic diff ("<<j<<"):\n"<<J_autodiff_[j]<<std::endl;
-                    std::cout<<"Difference analytic-automatic ("<<j<<"):\n"<<err[j]<<std::endl;
+                    std::cout<<"Difference analytic-automatic ("<<j<<"): "<<tej[j]<<"\n"<<err[j]<<std::endl;
+                    if (display == DISPLAY_ERROR_AND_NUMERIC || display == DISPLAY_ALL_AND_NUMERIC)
+                    {
+                        std::cout<<"Difference analytic-numeric ("<<j<<"): "<<tej2[j]<<"\n"<<err2[j]<<std::endl;
+                        std::cout<<"Difference automatic-numeric ("<<j<<"): "<<tej3[j]<<"\n"<<err3[j]<<std::endl;
+                    }
                     std::cout<<"Jacobian error ("<<j<<"): "<<tej[j]<<std::endl;
                 }
                 std::cout<<"Test pass: "<<(!berr?"True":"False")<<std::endl;
@@ -208,6 +244,11 @@ protected:
     double** jacobians_analytic_;
 
     /*!
+     * \brief Jacobians computed usng numeric differentiation.
+     */
+    double** jacobians_numeric_;
+
+    /*!
      * \brief Size of residual block.
      */
     int num_residuals;
@@ -220,7 +261,12 @@ protected:
     /*!
      * \brief Cost function to compute the automatic differentiation.
      */
-    ceres::CostFunction* cost_function_;
+    ceres::CostFunction* cost_function_automatic_;
+
+    /*!
+     * \brief Cost function to compute the numeric differentiation.
+     */
+    ceres::CostFunction* cost_function_numeric_;
 
     /*!
      * \brief Function to compute the analytic differentiation.
@@ -231,6 +277,11 @@ protected:
      * \brief List of jacobians computed with automatic differentiation.
      */
     std::vector<ceres::Matrix> J_autodiff_;
+
+    /*!
+     * \brief List of jacobians computed with numeric differentiation.
+     */
+    std::vector<ceres::Matrix> J_numeric_;
 
     /*!
      * \brief List of jacobians computed with analytic differentiation.
