@@ -5,13 +5,22 @@
 #include <exception>
 
 /**
+ * \mainpage
+ *
+ * This package implemnts the transformations and their jacobians from \cite Neira1993 and \cite Smith1990
+ * \author Albert Palomer Vila
+ *
+ */
+
+
+/**
  * \defgroup TRANSFORMATIONS Transformation implementation of the transformation and its derivatives.
  *
  * \{
  */
 
 /*!
- * \brief Angle between two quaternions. Implemented from <a link="https://math.stackexchange.com/questions/90081/quaternion-distance">Quaternion distance</a>
+ * \brief Angle between two quaternions. Implemented from <a href="https://math.stackexchange.com/questions/90081/quaternion-distance">Quaternion distance</a>
  */
 template<typename T>
 T quaternionAngle(Eigen::Quaternion<T> q1, Eigen::Quaternion<T> q2)

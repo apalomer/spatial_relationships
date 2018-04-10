@@ -1,7 +1,7 @@
 DOXYFILE_ENCODING = UTF-8
 PROJECT_NAME = @PROJECT_NAME@
-PROJECT_NUMBER = @L3S_VERSION@
-PROJECT_BRIEF = "Spatial relationship and jacobians. Equations copied from José Neira Ph.D. Thesis: Geometric Object Recognition in Multisensor Systems (1993)"
+PROJECT_NUMBER = @VERSION@
+PROJECT_BRIEF = "Spatial relationship and jacobians."
 OUTPUT_DIRECTORY       = @DOXYGEN_OUTPUT_DIR@
 INPUT                  = @CMAKE_SOURCE_DIR@
 FILE_PATTERNS = *.cpp *.txt *.cmake* *.h *.hpp *.h.in
@@ -19,3 +19,4 @@ HAVE_DOT = YES
 INCLUDED_BY_GRAPH = YES
 CALL_GRAPH = @DOXYGEN_CALL_GRAPH@
 CALLER_GRAPH = @DOXYGEN_CALLER_GRAPH@
+CITE_BIB_FILES = @CMAKE_SOURCE_DIR@/bibliography.bib

@@ -10,6 +10,13 @@ cmake_minimum_required(VERSION 2.8)
 # Project Name
 project(spatial_relationship)
 
+# Version
+set(MAJOR_VERSION 1)
+set(MINOR_VERSION 0)
+set(PATCH_VERSION 0)
+set(VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION})
+message(STATUS "${PROJECT_NAME} version ${VERSION}")
+
 # Set bin output
 set(CMAKE_BIN "${CMAKE_SOURCE_DIR}/bin")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BIN})
