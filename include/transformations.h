@@ -26,6 +26,8 @@
 
 /*!
  * \brief Angle between two quaternions. Implemented from <a href="https://math.stackexchange.com/questions/90081/quaternion-distance">Mathematics (Stack Exchange): Quaternion distance</a>
+ * \callgraph
+ * \callergraph
  */
 template<typename T>
 T quaternionAngle(Eigen::Quaternion<T> q1, Eigen::Quaternion<T> q2)
@@ -36,6 +38,8 @@ T quaternionAngle(Eigen::Quaternion<T> q1, Eigen::Quaternion<T> q2)
 
 /*!
  * \brief Distance between two quaternions. Implemented from  <a href="https://math.stackexchange.com/questions/90081/quaternion-distance">Mathematics (Stack Exchange): Quaternion distance</a>
+ * \callgraph
+ * \callergraph
  */
 template<typename T>
 T quaternionDistance(Eigen::Quaternion<T> q1, Eigen::Quaternion<T> q2)
@@ -176,6 +180,8 @@ Eigen::Matrix<T,6,1> compound3D(const Eigen::Matrix<T,6,1>& x1, const Eigen::Mat
  * \param x2 3D position and orientation (x,y,z,roll,pitch,yaw)
  * \param J1 jacobian with respect to x1
  * \param J2 jacobian with respect to x2
+ * \callgraph
+ * \callergraph
  */
 template<typename T>
 void compound3DJacobian(const Eigen::Matrix<T,6,1>& x1, const Eigen::Matrix<T,6,1>& x2, Eigen::Matrix<T,6,6>& J1, Eigen::Matrix<T,6,6>& J2)
@@ -324,6 +330,8 @@ Eigen::Matrix<T,6,1> inverseCompound3D(const Eigen::Matrix<T,6,1>& x)
 
 /*!
  * \brief Computes the Jacobian (6x6) of the pose x.
+ * \callgraph
+ * \callergraph
  */
 template<typename T>
 Eigen::Matrix<T,6,6> inverseCompound3DJacobian(const Eigen::Matrix<T,6,1>& x)

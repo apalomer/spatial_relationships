@@ -14,6 +14,8 @@
  * \param fMin minimum value.
  * \param fMax maximum value.
  * \return pseudorandom value.
+ * \callgraph
+ * \callergraph
  */
 template<typename T>
 T fRand(T fMin, T fMax)
@@ -27,6 +29,8 @@ T fRand(T fMin, T fMax)
  * \param min_translation
  * \param max_translation
  * \return pose
+ * \callgraph
+ * \callergraph
  */
 template<typename T>
 Eigen::Matrix<T,6,1> randomPose(T min_translation, T max_translation)

@@ -20,6 +20,8 @@
 /*!
  * \brief usage
  * \param exec_name name of the executable.
+ * \callgraph
+ * \callergraph
  */
 void usage(std::string exec_name)
 {
@@ -38,6 +40,8 @@ void usage(std::string exec_name)
  * \param argc number of input arguments
  * \param argv list of input arguments
  * \return
+ * \callgraph
+ * \callergraph
  */
 int main(int argc, char** argv)
 {

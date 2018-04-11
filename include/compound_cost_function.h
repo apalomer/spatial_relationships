@@ -8,6 +8,8 @@
 
 /*!
  * \brief The InverseCompound3D class
+ * \callgraph
+ * \callergraph
  */
 class Compound3D: public ceres::SizedCostFunction<6,6,6>{
 public:
@@ -25,6 +27,8 @@ public:
      * \param[out] residuals
      * \param[out] jacobians
      * \return ture/false if the residuals and the jacobians have been properly evaluated.
+     * \callgraph
+     * \callergraph
      */
     bool Evaluate(double const* const* parameters, double* residuals, double** jacobians) const;
 
@@ -34,6 +38,8 @@ public:
      * \param x2
      * \param[out] residuals = x1 (+) x2
      * \return ture/false if the residuals and the jacobians have been properly evaluated.
+     * \callgraph
+     * \callergraph
      */
     template<typename T>
     bool operator()(const T* const x1, const T* const x2, T* residuals) const

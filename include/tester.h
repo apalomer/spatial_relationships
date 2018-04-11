@@ -6,6 +6,8 @@
 
 /*!
  * Tester class for Compound3D and InverseCompound3D
+ * \callgraph
+ * \callergraph
  */
 template<typename CostFunctionToProbe, int M = 0, int N0 = 0, int N1 = 0>
 class Tester{
@@ -13,6 +15,8 @@ public:
 
     /*!
      * Display mode for the Tester class.
+     * \callgraph
+     * \callergraph
      */
     enum{
         DISPLAY_NONE,
@@ -24,6 +28,8 @@ public:
 
     /*!
      * \brief Constructor
+     * \callgraph
+     * \callergraph
      */
     Tester()
     {
@@ -103,6 +109,8 @@ public:
      * \param max_error
      * \param display
      * \return
+     * \callgraph
+     * \callergraph
      */
     int test(int iterations, double max_error, int display = DISPLAY_ERROR)
     {
