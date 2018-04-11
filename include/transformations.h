@@ -4,10 +4,15 @@
 #include <Eigen/Core>
 #include <exception>
 
+//#define NEIRA
+
 /**
  * \mainpage
  *
- * This package implemnts the transformations and their jacobians from \cite Neira1993 and \cite Smith1990
+ * This package implemnts the transformations and their jacobians from \cite Neira1993 and \cite Smith1990. The jacobian of the inverse was not working
+ * and has been implemented differently. Please, see <a href="equations.pdf">this document</a> for differentiation details. If Ceres Solver \cite ceres-solver is available a test
+ * program comparing the analitical derivatives with the numeric and automatic differentiation from Ceres Solver is compiled.
+ *
  * \author Albert Palomer Vila
  *
  */
@@ -20,7 +25,7 @@
  */
 
 /*!
- * \brief Angle between two quaternions. Implemented from <a href="https://math.stackexchange.com/questions/90081/quaternion-distance">Quaternion distance</a>
+ * \brief Angle between two quaternions. Implemented from <a href="https://math.stackexchange.com/questions/90081/quaternion-distance">Mathematics (Stack Exchange): Quaternion distance</a>
  */
 template<typename T>
 T quaternionAngle(Eigen::Quaternion<T> q1, Eigen::Quaternion<T> q2)
@@ -30,7 +35,7 @@ T quaternionAngle(Eigen::Quaternion<T> q1, Eigen::Quaternion<T> q2)
 }
 
 /*!
- * \brief Distance between two quaternions. Implemented from <a link="https://math.stackexchange.com/questions/90081/quaternion-distance">Quaternion distance</a>
+ * \brief Distance between two quaternions. Implemented from  <a href="https://math.stackexchange.com/questions/90081/quaternion-distance">Mathematics (Stack Exchange): Quaternion distance</a>
  */
 template<typename T>
 T quaternionDistance(Eigen::Quaternion<T> q1, Eigen::Quaternion<T> q2)
@@ -367,6 +372,7 @@ Eigen::Matrix<T,6,6> inverseCompound3DJacobian(const Eigen::Matrix<T,6,1>& x)
     N(2,1) = -a_z*t_x*cy - a_z*t_y*sy + t_z*sp*cr;
     N(2,2) = a_y*t_x - a_x*t_y;
 
+#ifdef NEIRA
     // Check a_x
     if (a_x == T(1))
     {
@@ -387,6 +393,79 @@ Eigen::Matrix<T,6,6> inverseCompound3DJacobian(const Eigen::Matrix<T,6,1>& x)
     Q(2,0) = n_x*a_x/aux;
     Q(2,1) = -a_y*cy/aux;
     Q(2,2) = -a_z/aux;
+#else
+
+    // Compute rotation matrix
+    Eigen::Matrix<T,3,3> roti = rot.transpose();
+
+    // Auxiliary computations
+    Eigen::Matrix<T,3,1> ni = roti.col(0);
+    T ni_x = ni(0,0);
+    T ni_y = ni(1,0);
+    T ni_z = ni(2,0);
+    Eigen::Matrix<T,3,1> oi = roti.col(1);
+    T oi_y = oi(1,0);
+    T oi_z = oi(2,0);
+    Eigen::Matrix<T,3,1> ai = roti.col(2);
+    T ai_z = ai(2,0);
+
+    // Derivatives
+    Eigen::Matrix<T,3,1> daz;
+    daz(0,0) = -cp*sr;
+    daz(1,0) = -sp*cr;
+    daz(2,0) = 0;
+    Eigen::Matrix<T,3,1> doz;
+    doz(0,0) = -oi_y;
+    doz(1,0) = sy*cp*cr;
+    doz(2,0) = ni_z;
+    Eigen::Matrix<T,3,1> dnx;
+    dnx(0,0) = 0;
+    dnx(1,0) = -cy*sp;
+    dnx(2,0) = -sy*cp;
+    Eigen::Matrix<T,3,1> dny;
+    dny(0,0) = ni_z;
+    dny(1,0) = cy*cp*sr;
+    dny(2,0) = -oi_y;
+    Eigen::Matrix<T,3,1> dy;
+    dy(0,0) = cy*sp*sr - sy*cr;
+    dy(1,0) = -cy*cp*cr;
+    dy(2,0) = sy*sp*cr-cy*sr;
+
+    // Compute Q
+    Eigen::Matrix<T,3,3> Q = Eigen::Matrix<T,3,3>::Zero();
+    T Q000 = pow(ai_z,2)+pow(oi_z,2);
+    T Q00 = -oi_z/Q000;
+    T Q01 = ai_z/Q000;
+    Q(0,0) = Q00*daz(0,0) + Q01*doz(0,0);
+    Q(0,1) = Q00*daz(1,0) + Q01*doz(1,0);
+    Q(0,2) = Q00*daz(2,0) + Q01*doz(2,0);
+    T Q222 = pow(ni_x,2)+pow(ni_y,2);
+    T Q20 = -ni_y/Q222;
+    T Q21 = ni_x/Q222;
+    Q(2,0) = Q20*dnx(0,0) + Q21*dny(0,0);
+    Q(2,1) = Q20*dnx(1,0) + Q21*dny(1,0);
+    Q(2,2) = Q20*dnx(2,0) + Q21*dny(2,0);
+
+    // Compute derivatives of the new pitch angle
+    Eigen::Matrix<T,3,1> dx;
+    T phi_ = xi(5,0);
+    T sy_ = sin(phi_);
+    T cy_ = cos(phi_);
+    T dxdphi_ = ni_y*cy_ - cy*cp*sy_;
+    dx(0,0) = ni_z*sy_ + dxdphi_*Q(2,0);
+    dx(1,0) = cy*cp*sr*sy_ - cy*sp*cy_+ dxdphi_*Q(2,1);
+    dx(2,0) = -(oi_y*sy_ + sy*cp*cy_)+ dxdphi_*Q(2,2);
+
+    // Finish jacobian
+    T x_ = ni_x*cy_ + ni_y*sy_;
+    T y_ = -ni_z;
+    T Q111 = pow(x_,2)+pow(y_,2);
+    T Q10 = -y_/Q111;
+    T Q11 = x_/Q111;
+    Q(1,0) = Q10*dx(0,0) + Q11*dy(0,0);
+    Q(1,1) = Q10*dx(1,0) + Q11*dy(1,0);
+    Q(1,2) = Q10*dx(2,0) + Q11*dy(2,0);
+#endif
 
     // Construct the jacobian
     Eigen::Matrix<T,6,6> J = Eigen::Matrix<T,6,6>::Zero();

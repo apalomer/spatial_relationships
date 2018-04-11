@@ -41,6 +41,7 @@ void usage(std::string exec_name)
  */
 int main(int argc, char** argv)
 {
+
     // Parse inputs
     int n(ITERATIONS);
     int display_level(DISPLAY_LEVEL);

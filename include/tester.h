@@ -112,8 +112,7 @@ public:
             // Create random x
             for (int j = 0;j<parameters_size_.size();j++)
             {
-                Eigen::Matrix<double,6,1> aux;
-                aux<<fRand(-100,100),fRand(-100,100),fRand(-100,100),fRand(-M_PI,M_PI),fRand(-M_PI,M_PI),fRand(-M_PI,M_PI);
+                Eigen::Matrix<double,6,1> aux = randomPose<double>(-100,100);
                 for (int k = 0;k<6;k++) parameters_[j][k] = aux(k,0);
             }
 

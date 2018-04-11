@@ -1,0 +1,151 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[UKenglish]{babel}
+\usepackage{fancyhdr}
+\usepackage{anysize}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{lastpage}
+\usepackage[all]{xy}  % drawings
+%\usepackage{listings} % code highlighting
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{bm}
+\usepackage{breqn}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+
+\DeclareMathOperator{\rot}{\textbf{Rot}}
+\DeclareMathOperator{\atan2}{atan2}
+
+
+\begin{document}
+
+\section{Differentiating}
+To compute the complex derivatives use the \href{https://en.wikipedia.org/wiki/Total_derivative}{Total Derivative theorem}:
+
+\begin{equation}
+	\frac{\mathrm{d}f}{\mathrm{d}t} = \frac{\partial f}{\partial t} \frac{\mathrm{d}t}{\mathrm{d}t} + 
+ 	                                  \frac{\partial f}{\partial x} \frac{\mathrm{d}x}{\mathrm{d}t} +
+ 	                                  \frac{\partial f}{\partial y} \frac{\mathrm{d}y}{\mathrm{d}t} + \ldots
+\end{equation}
+
+\subsection{Differentiating $\atan2$}
+
+\begin{eqnarray}
+	\frac{\mathrm{d}\atan2\left(y,x\right)}{\mathrm{d}\theta} = \frac{\partial\atan2\left(y,x\right)}{\partial\theta}\frac{\mathrm{d} \theta}{\mathrm{d}\theta} + \frac{\partial\atan2\left(y,x\right)}{\partial x}\frac{\mathrm{d} x}{\mathrm{d}\theta} +\frac{\partial\atan2\left(y,x\right)}{\partial y}\frac{\mathrm{d} y}{\mathrm{d}\theta} \nonumber \\
+	= -\frac{y}{x^2+y^2}\frac{\mathrm{d} x}{\mathrm{d} \theta} + \frac{x}{x^2+y^2}\frac{\mathrm{d} y}{\mathrm{d} \theta}
+\end{eqnarray}
+
+\section{3D Transformations}
+
+The vector $^{\{A\}}\bm{t}_{\{B\}} = \left[ x \; y \; z \; \psi \; \theta \; \phi \right]$ represents a rigid transformation between two frames $\{A\}$ and $\{B\}$, specifically, how $\{B\}$ is seen from $\{A\}$. 
+
+\subsection{Inverse compounding}
+
+\begin{equation}
+\pmb{t}' = \ominus \pmb{t} = \begin{bmatrix} 
+	x' \\ y' \\ z' \\  \psi' \\ \theta' \\ \phi' \end{bmatrix} = 
+	\begin{bmatrix} -\pmb{R}^T\begin{bmatrix} x \\ y \\ z \end{bmatrix} \\  \atan2(o'_z,a'_z) \\ \atan2(-n'_z,n'_x\cos(\phi')+n'_y\sin(\phi')) \\ \atan2(n'_y,n'_x) \end{bmatrix}
+\end{equation}
+
+where:
+
+\begin{equation}
+\pmb{R} = \begin{bmatrix} n_x & o_x & a_x \\ n_y & o_y & a_y \\ n_z & o_z & a_z \end{bmatrix} ; \bm{R}' = \bm{R}^T ; \bm{R}' = \begin{bmatrix} n'_x & o'_x & a'_x \\ n'_y & o'_y & a'_y \\ n'_z & o'_z & a'_z \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\pmb{J}_\ominus = \begin{bmatrix} -\pmb{R}^T & \pmb{N} \\ \pmb{0}_{3\times3} & \pmb{Q} \end{bmatrix}
+\end{equation}
+
+with:
+
+
+\begin{equation}
+ \pmb{N} = \begin{bmatrix} 0 & -n_z x \cos(\phi)-n_zy\sin(\phi)+z\cos(\theta) & n_y x-n_x y\\z' & -o_z x \cos(\phi) - o_z y \sin(\phi) + z \sin(\theta) \sin(\psi) & o_y x - o_x y \\ -y' & a_z x \cos(\phi) - a_z y \sin(\phi) + z \sin(\theta) \cos(\psi) & a_y x - a_x y \end{bmatrix}
+\end{equation}
+\begin{equation}
+\pmb{Q} = \begin{bmatrix} -n_x/(1-a_x^2) & -o_x \cos(\psi)/(1-a_x^2) & a_z a_x / (1 - a_x^2) \\ o_x/(1-a_x^2)^{1/2} & -a_z \cos(\phi) / (1-a_x^2)^{1/2} & a_y/(1-a_x^2)^{1/2} \\ n_x a_x /(1-a_x^2) & -a_y \cos(\phi) /(1-a_x^2) & -a_z /(1-a_x^2) \end{bmatrix}
+\end{equation}
+
+The inverted rotation matrix is:
+
+\begin{eqnarray}
+	\bm{R}' = \begin{bmatrix}
+		\cos \left(\phi\right) \cos \left(\theta\right) & \cos \left(\phi\right) \sin \left(\theta\right) \sin \left(\psi\right) -\sin \left(\phi\right) \cos \left(\psi\right) & \cos \left(\phi\right) \sin \left(\theta\right) \cos \left(\psi\right) + \sin \left(\phi\right) \sin \left(\psi\right) \\
+		\sin \left(\phi\right) \cos \left(\theta\right) & \sin \left(\phi\right) \sin \left(\theta\right) \sin \left(\psi\right) + \cos \left(\phi\right) \cos \left(\psi\right) & \sin \left(\phi\right) \sin \left(\theta\right) \cos \left(\psi\right) - \cos \left(\phi\right) \sin \left(\psi\right) \\ 
+		-\sin \left(\theta\right) & \cos \left(\theta\right) \sin \left(\psi\right) & \cos \left(\theta\right)  \cos \left(\psi\right)
+	\end{bmatrix}^T \\
+	\bm{R}' = \begin{bmatrix}
+		\cos \left(\phi\right) \cos \left(\theta\right) & \sin \left(\phi\right) \cos \left(\theta\right) & -\sin \left(\theta\right) \\
+		\cos \left(\phi\right) \sin \left(\theta\right) \sin \left(\psi\right) -\sin \left(\phi\right) \cos \left(\psi\right) & \sin \left(\phi\right) \sin \left(\theta\right) \sin \left(\psi\right) + \cos \left(\phi\right) \cos \left(\psi\right) & \cos \left(\theta\right) \sin \left(\psi\right) \\ 
+		\cos \left(\phi\right) \sin \left(\theta\right) \cos \left(\psi\right) + \sin \left(\phi\right) \sin \left(\psi\right) & \sin \left(\phi\right) \sin \left(\theta\right) \cos \left(\psi\right) - \cos \left(\phi\right) \sin \left(\psi\right) & \cos \left(\theta\right)  \cos \left(\psi\right)
+	\end{bmatrix} \\
+	\bm{R}' = \begin{bmatrix}
+		\cos \left(\phi'\right) \cos \left(\theta'\right) & \cos \left(\phi'\right) \sin \left(\theta'\right) \sin \left(\psi'\right) -\sin \left(\phi'\right) \cos \left(\psi'\right) & \cos \left(\phi'\right) \sin \left(\theta'\right) \cos \left(\psi'\right) + \sin \left(\phi'\right) \sin \left(\psi'\right) \\
+		\sin \left(\phi'\right) \cos \left(\theta'\right) & \sin \left(\phi'\right) \sin \left(\theta'\right) \sin \left(\psi'\right) + \cos \left(\phi'\right) \cos \left(\psi'\right) & \sin \left(\phi'\right) \sin \left(\theta'\right) \cos \left(\psi'\right) - \cos \left(\phi'\right) \sin \left(\psi'\right) \\ 
+		-\sin \left(\theta'\right) & \cos \left(\theta'\right) \sin \left(\psi'\right) & \cos \left(\theta'\right)  \cos \left(\psi'\right)
+	\end{bmatrix}
+\end{eqnarray}
+
+First line of $\bm{Q}$:
+
+\begin{eqnarray}
+	&Q_{1,1} = \frac{\mathrm{d} \psi'}{\mathrm{d} \psi} = \frac{\mathrm{d} \atan2(o'_z,a'_z)}{\mathrm{d} \psi} =  -\frac{o'_z}{a_z^{'2} + o_z^{'2}} \frac{\mathrm{d}  a'_z}{\mathrm{d} \psi} + \frac{a'_z}{a_z^{'2} + o_z^{'2}} \frac{\mathrm{d}  o'_z}{\mathrm{d} \psi}\\
+	&Q_{1,2} = \frac{\mathrm{d} \psi'}{\mathrm{d} \theta} = \frac{\mathrm{d} \atan2(o'_z,a'_z)}{\mathrm{d} \theta} =  -\frac{o'_z}{a_z^{'2} + o_z^{'2}} \frac{\mathrm{d}  a'_z}{\mathrm{d} \theta} + \frac{a'_z}{a_z^{'2} + o_z^{'2}} \frac{\mathrm{d}  o'_z}{\mathrm{d} \theta}\\
+	&Q_{1,3} = \frac{\mathrm{d} \psi'}{\mathrm{d} \phi} = \frac{\mathrm{d} \atan2(o'_z,a'_z)}{\mathrm{d} \phi} =  -\frac{o'_z}{a_z^{'2} + o_z^{'2}} \frac{\mathrm{d}  a'_z}{\mathrm{d} \phi} + \frac{a'_z}{a_z^{'2} + o_z^{'2}} \frac{\mathrm{d}  o'_z}{\mathrm{d} \phi}\\
+	& a'_z = \cos \left(\theta\right)  \cos \left(\psi\right)\\
+	&\frac{\mathrm{d} a'_z}{\mathrm{d} \psi} = -\cos \left(\theta\right)  \sin \left(\psi\right)\\
+	&\frac{\mathrm{d} a'_z}{\mathrm{d} \theta} = -\sin \left(\theta\right)  \cos \left(\psi\right)\\
+	&\frac{\mathrm{d} a'_z}{\mathrm{d} \phi} = 0 \\
+	& o'_z = \sin \left(\phi\right) \sin \left(\theta\right) \cos \left(\psi\right) - \cos \left(\phi\right) \sin \left(\psi\right) \\
+	&\frac{\mathrm{d} o'_z}{\mathrm{d} \psi} = -\left(\sin \left(\phi\right) \sin \left(\theta\right) \sin \left(\psi\right) + \cos \left(\phi\right) \cos \left(\psi\right) \right) = -o'_y\\
+	&\frac{\mathrm{d} o'_z}{\mathrm{d} \theta} = \sin \left(\phi\right) \cos \left(\theta\right) \cos \left(\psi\right)\\
+	&\frac{\mathrm{d} o'_z}{\mathrm{d} \phi} = \cos \left(\phi\right) \sin \left(\theta\right) \cos \left(\psi\right) + \sin \left(\phi\right) \sin \left(\psi\right) = n'_z\\
+\end{eqnarray}
+
+Third line of $\bm{Q}$:
+\begin{eqnarray}
+	&Q_{3,1} = \frac{\mathrm{d} \phi'}{\mathrm{d} \psi} = \frac{\mathrm{d} \atan2(n'_y,n'_x)}{\mathrm{d} \psi} =  -\frac{n'_y}{n_x^{'2} + n_y^{'2}} \frac{\mathrm{d}  n'_x}{\mathrm{d} \psi} + \frac{n'_x}{n_x^{'2} + n_y^{'2}} \frac{\mathrm{d}  n'_y}{\mathrm{d} \psi}\\
+	&Q_{3,2} = \frac{\mathrm{d} \phi'}{\mathrm{d} \theta} = \frac{\mathrm{d} \atan2(n'_y,n'_x)}{\mathrm{d} \theta} =  -\frac{n'_y}{n_x^{'2} + n_y^{'2}} \frac{\mathrm{d}  n'_x}{\mathrm{d} \theta} + \frac{n'_x}{n_x^{'2} + n_y^{'2}} \frac{\mathrm{d}  n'_y}{\mathrm{d} \theta}\\
+	&Q_{3,3} = \frac{\mathrm{d} \phi'}{\mathrm{d} \phi} = \frac{\mathrm{d} \atan2(n'_y,n'_x)}{\mathrm{d} \phi} =  -\frac{n'_y}{n_x^{'2} + n_y^{'2}} \frac{\mathrm{d}  n'_x}{\mathrm{d} \phi} + \frac{n'_x}{n_x^{'2} + n_y^{'2}} \frac{\mathrm{d}  n'_y}{\mathrm{d} \phi}\\
+	& n'_x = \cos \left(\phi\right) \cos \left(\theta\right)\\
+	&\frac{\mathrm{d} n'_x}{\mathrm{d} \psi} = 0 \\
+	&\frac{\mathrm{d} n'_x}{\mathrm{d} \theta} = -\cos \left(\phi\right) \sin \left(\theta\right)\\
+	&\frac{\mathrm{d} n'_x}{\mathrm{d} \phi} = -\sin \left(\phi\right) \cos \left(\theta\right)\\
+	& n'_y = \cos \left(\phi\right) \sin \left(\theta\right) \sin \left(\psi\right) -\sin \left(\phi\right) \cos \left(\psi\right) \\
+	&\frac{\mathrm{d} n'_y}{\mathrm{d} \psi} = \cos \left(\phi\right) \sin \left(\theta\right) \cos \left(\psi\right) + \sin \left(\phi\right) \sin \left(\psi\right) = n'_z = \frac{\mathrm{d} o'_z}{\mathrm{d} \phi}\\
+	&\frac{\mathrm{d} n'_y}{\mathrm{d} \theta} = \cos \left(\phi\right) \cos \left(\theta\right) \sin \left(\psi\right)\\
+	&\frac{\mathrm{d} n'_y}{\mathrm{d} \phi} = -\left(\sin \left(\phi\right) \sin \left(\theta\right) \sin \left(\psi\right) +\cos \left(\phi\right) \cos \left(\psi\right)\right) = -o'_y = \frac{\mathrm{d} o'_z}{\mathrm{d} \psi}\\
+\end{eqnarray}
+
+Second line of $\bm{Q}$:
+\begin{eqnarray}
+	&Q_{2,1} = \frac{\mathrm{d} \theta'}{\mathrm{d} \psi} = \frac{\mathrm{d} \atan2(y,x)}{\mathrm{d} \psi} =  -\frac{y}{x^2+y^2}\frac{\mathrm{d} x}{\mathrm{d} \psi} + \frac{x}{x^2+y^2}\frac{\mathrm{d} y}{\mathrm{d} \psi}\\
+	&Q_{2,2} = \frac{\mathrm{d} \theta'}{\mathrm{d} \theta} = \frac{\mathrm{d} \atan2(y,x)}{\mathrm{d} \theta} =  -\frac{y}{x^2+y^2}\frac{\mathrm{d} x}{\mathrm{d}\theta} + \frac{x}{x^2+y^2}\frac{\mathrm{d} y}{\mathrm{d}\theta}\\
+	&Q_{2,3} = \frac{\mathrm{d} \theta'}{\mathrm{d} \phi} = \frac{\mathrm{d} \atan2(y,x)}{\mathrm{d} \phi} =  -\frac{y}{x^2+y^2}\frac{\mathrm{d} x}{\mathrm{d} \phi} + \frac{x}{x^2+y^2}\frac{\mathrm{d} y}{\mathrm{d} \phi}\\
+	&x = n'_x \cos\left(\phi' \right) + n'_y \sin\left(\phi' \right) = \cos \left(\phi\right) \cos \left(\theta\right) \cos\left(\phi'\right)+ \nonumber \\
+	&\left(\cos \left(\phi\right) \sin \left(\theta\right) \sin \left(\psi\right) -\sin \left(\phi\right) \cos \left(\psi\right) \right)\sin\left(\phi' \right) \\
+	&\frac{\mathrm{d} x}{\mathrm{d} \psi} =  \frac{\partial x}{\partial \psi} \frac{\mathrm{d} \psi}{\mathrm{d} \psi} + \frac{\partial x}{\partial \phi'} \frac{\mathrm{d} \phi'}{\mathrm{d} \psi}\\
+	&\frac{\mathrm{d} x}{\mathrm{d} \theta} = \frac{\partial x}{\partial \theta} \frac{\mathrm{d} \theta}{\mathrm{d} \theta} + \frac{\partial x}{\partial \phi'} \frac{\mathrm{d} \phi'}{\mathrm{d} \theta}\\
+	&\frac{\mathrm{d} x}{\mathrm{d} \phi} =  \frac{\partial x}{\partial \phi} \frac{\mathrm{d} \phi}{\mathrm{d} \phi} + \frac{\partial x}{\partial \phi'} \frac{\mathrm{d} \phi'}{\mathrm{d} \phi}\\
+	& \frac{\partial x}{\partial \psi} = \left(\cos \left(\phi\right) \sin \left(\theta\right) \cos \left(\psi\right) + \sin \left(\phi\right) \sin \left(\psi\right) \right)\sin\left(\phi' \right) = n'_z \sin\left(\phi'\right)\\
+	& \frac{\partial x}{\partial \theta} = \cos \left(\phi\right) \cos \left(\theta\right) \sin \left(\psi\right) \sin\left(\phi' \right) - \cos\left(\phi\right)\sin\left(\theta\right) \cos\left(\phi'\right)\\
+	& \frac{\partial x}{\partial \phi} = -\left[\left(\sin \left(\phi\right) \sin \left(\theta\right) \sin \left(\psi\right) + \cos \left(\phi\right) \cos \left(\psi\right) \right)\sin\left(\phi' \right) + \sin\left(\phi\right)\cos\left(\theta\right)\cos\left(\phi'\right)\right] \nonumber\\
+	&= -\left(o_y \sin\left(\phi'\right) + \sin\left(\phi\right)\cos\left(\theta\right)\cos\left(\phi'\right) \right) \\
+	& \frac{\partial x}{\partial \phi'} = \left(\cos \left(\phi\right) \sin \left(\theta\right) \sin \left(\psi\right) -\sin \left(\phi\right) \cos \left(\psi\right) \right)\cos\left(\phi' \right) - \cos\left(\phi\right) \cos\left(\theta\right) \sin\left(\phi'\right) \nonumber \\
+	&= n'_y \cos\left(\phi'\right) - \cos\left(\phi\right) \cos\left(\theta\right) \sin\left(\phi'\right)\\
+	&y = -n'_z = -\cos \left(\phi\right) \sin \left(\theta\right) \cos \left(\psi\right) - \sin \left(\phi\right) \sin \left(\psi\right)\\
+	&\frac{\mathrm{d} y}{\mathrm{d} \psi} = \cos \left(\phi\right) \sin \left(\theta\right) \sin \left(\psi\right) - \sin \left(\phi\right) \cos \left(\psi\right)\\
+	&\frac{\mathrm{d} y}{\mathrm{d} \theta} = -\cos \left(\phi\right) \cos \left(\theta\right) \cos \left(\psi\right)\\
+	&\frac{\mathrm{d} y}{\mathrm{d} \phi} = \sin \left(\phi\right) \sin \left(\theta\right) \cos \left(\psi\right) - \cos \left(\phi\right) \sin \left(\psi\right)\\
+\end{eqnarray}
+
+\end{document}

@@ -11,5 +11,8 @@ ceres-solver-test
 *.json
 *.18
 *-pre1
-latex
 doc
+*.aux
+*.log
+*.out
+*.synctex.gz
