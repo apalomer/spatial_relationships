@@ -2,6 +2,9 @@
 
 #include "compound_cost_function.h"
 #include "inverse_compound_cost_function.h"
+#include "quaternion_from_rpy_cost_function.h"
+#include "quaternion_angle_cost_function.h"
+#include "quaternion_distance_cost_function.h"
 #include "tester.h"
 
 #define MAX_ERROR 0.0005
@@ -9,6 +12,9 @@
 #define DISPLAY_LEVEL Tester<InverseCompound3D,6,6>::DISPLAY_NONE
 #define COMPUTE_INVERSION false
 #define COMPUTE_COMPOUNDING false
+#define COMPUTE_QUATERNION_FROM_RPY false
+#define COMPUTE_QUATERNION_DISTANCE false
+#define COMPUTE_QUATERNION_ANGLE false
 
 
 /**
@@ -30,6 +36,9 @@ void usage(std::string exec_name)
     std::cout<<"  -h    display this message\n";
     std::cout<<"  -c    test compounding (+) operation\n";
     std::cout<<"  -i    test inverse compounding (-) operation\n";
+    std::cout<<"  -q    test quaternion from rpy operation\n";
+    std::cout<<"  -qd   test quaternion distance operation\n";
+    std::cout<<"  -qa   test quaternion angle operation\n";
     std::cout<<"  -m    max error (default: "<<MAX_ERROR<<")\n";
     std::cout<<"  -d    display level (default: "<<DISPLAY_LEVEL<<", available: all ("<<Tester<InverseCompound3D,6,6>::DISPLAY_ALL<<"), all with numeric differentiation ("<<Tester<InverseCompound3D,6,6>::DISPLAY_ALL_AND_NUMERIC<<"), errors ("<<Tester<InverseCompound3D,6,6>::DISPLAY_ERROR<<"), errors with numeric differentiation ("<<Tester<InverseCompound3D,6,6>::DISPLAY_ERROR_AND_NUMERIC<<") and none ("<<Tester<InverseCompound3D,6,6>::DISPLAY_NONE<<"))\n";
     std::cout<<"  -n    number of tests (default: "<<ITERATIONS<<")\n";
@@ -51,6 +60,9 @@ int main(int argc, char** argv)
     int display_level(DISPLAY_LEVEL);
     bool compute_inversion(COMPUTE_INVERSION);
     bool compute_compounding(COMPUTE_COMPOUNDING);
+    bool compute_quaternion_from_rpy(COMPUTE_QUATERNION_FROM_RPY);
+    bool compute_quaternion_distance(COMPUTE_QUATERNION_DISTANCE);
+    bool compute_quaternion_angle(COMPUTE_QUATERNION_ANGLE);
     double max_error(MAX_ERROR);
     int i(1);
     while (i<argc)
@@ -63,6 +75,18 @@ int main(int argc, char** argv)
         else if (aux == "-i")
         {
             compute_inversion = true;
+        }
+        else if (aux == "-q")
+        {
+            compute_quaternion_from_rpy = true;
+        }
+        else if (aux == "-qd")
+        {
+            compute_quaternion_distance = true;
+        }
+        else if (aux == "-qa")
+        {
+            compute_quaternion_angle = true;
         }
         else if (aux == "-m")
         {
@@ -148,6 +172,45 @@ int main(int argc, char** argv)
         std::cout<<"*****************************************************************"<<std::endl;
         Tester<Compound3D,6,6,6> tc;
         int te = tc.test(n,max_error,display_level);
+        std::cout<<"Total errors: "<<te<<"/"<<n<<std::endl;
+    }
+
+    // Test Jacobians
+    if (compute_quaternion_from_rpy)
+    {
+        std::cout<<"*****************************************************************"<<std::endl;
+        std::cout<<"*                                                               *"<<std::endl;
+        std::cout<<"*            Testing quaternion from rpy function               *"<<std::endl;
+        std::cout<<"*                                                               *"<<std::endl;
+        std::cout<<"*****************************************************************"<<std::endl;
+        Tester<QuaternionFromRPY,4,3> tq;
+        int te = tq.test(n,max_error,display_level);
+        std::cout<<"Total errors: "<<te<<"/"<<n<<std::endl;
+    }
+
+    // Test Jacobians
+    if (compute_quaternion_angle)
+    {
+        std::cout<<"*****************************************************************"<<std::endl;
+        std::cout<<"*                                                               *"<<std::endl;
+        std::cout<<"*             Testing quaternion angle function                 *"<<std::endl;
+        std::cout<<"*                                                               *"<<std::endl;
+        std::cout<<"*****************************************************************"<<std::endl;
+        Tester<QuaternionAngle,1,4,4> tqa;
+        int te = tqa.test(n,max_error,display_level);
+        std::cout<<"Total errors: "<<te<<"/"<<n<<std::endl;
+    }
+
+    // Test Jacobians
+    if (compute_quaternion_distance)
+    {
+        std::cout<<"*****************************************************************"<<std::endl;
+        std::cout<<"*                                                               *"<<std::endl;
+        std::cout<<"*            Testing quaternion distance function               *"<<std::endl;
+        std::cout<<"*                                                               *"<<std::endl;
+        std::cout<<"*****************************************************************"<<std::endl;
+        Tester<QuaternionDistance,1,4,4> tqd;
+        int te = tqd.test(n,max_error,display_level);
         std::cout<<"Total errors: "<<te<<"/"<<n<<std::endl;
     }
 

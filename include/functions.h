@@ -3,6 +3,8 @@
 
 #include <Eigen/Dense>
 
+#include <istream>
+
 /**
  * \defgroup TOOLS Other tools used in the library
  *
@@ -39,6 +41,16 @@ Eigen::Matrix<T,6,1> randomPose(T min_translation, T max_translation)
     x<<fRand(min_translation,max_translation),fRand(min_translation,max_translation),fRand(min_translation,max_translation),
        fRand(T(-M_PI),T(M_PI)),fRand(T(-M_PI),T(M_PI)),fRand(T(-M_PI),T(M_PI));
     return x;
+}
+
+/*!
+ * \brief Operator << so quternions can be used with a std::ostream
+ */
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const Eigen::Quaternion<T>& q)
+{
+    os << "[" << q.w() <<","<< q.x() << "," << q.y() << "," << q.z() << "]";
+    return os;
 }
 
 /** \} */

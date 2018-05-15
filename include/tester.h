@@ -3,6 +3,7 @@
 
 #include <ceres/ceres.h>
 #include "functions.h"
+#include "transformations.h"
 
 /*!
  * Tester class for Compound3D and InverseCompound3D
@@ -19,10 +20,15 @@ public:
      * \callergraph
      */
     enum{
+        /// Do not display
         DISPLAY_NONE,
+        /// Display only the error
         DISPLAY_ERROR,
+        /// Display the error numeric also
         DISPLAY_ERROR_AND_NUMERIC,
+        /// Display jacobians and error
         DISPLAY_ALL,
+        /// Display jacobians and error also with errors
         DISPLAY_ALL_AND_NUMERIC
     };
 
@@ -120,8 +126,51 @@ public:
             // Create random x
             for (int j = 0;j<parameters_size_.size();j++)
             {
-                Eigen::Matrix<double,6,1> aux = randomPose<double>(-100,100);
-                for (int k = 0;k<6;k++) parameters_[j][k] = aux(k,0);
+                if (j == 0)
+                {
+                    if ( N0 == 6)
+                    {
+                        Eigen::Matrix<double,6,1> aux = randomPose<double>(-100,100);
+                        for (int k = 0;k<6;k++) parameters_[j][k] = aux(k,0);
+                    }
+                    else if (N0 == 4)
+                    {
+                        Eigen::Matrix<double,3,1> rpy;
+                        for (int k = 0;k<3;k++) rpy(k,0) = fRand<double>(-M_PI,M_PI);
+                        Eigen::Quaterniond q = quaternionFromRPY(rpy);
+                        parameters_[j][0] = q.w();
+                        parameters_[j][1] = q.x();
+                        parameters_[j][2] = q.y();
+                        parameters_[j][3] = q.z();
+                    }
+                    else
+                    {
+                        for (int k = 0;k<N0;k++) parameters_[j][k] = fRand<double>(-M_PI,M_PI);
+                    }
+
+                }
+                else if (j == 1)
+                {
+                    if (N1 == 6)
+                    {
+                        Eigen::Matrix<double,6,1> aux = randomPose<double>(-100,100);
+                        for (int k = 0;k<6;k++) parameters_[j][k] = aux(k,0);
+                    }
+                    else if (N1 == 4)
+                    {
+                        Eigen::Matrix<double,3,1> rpy;
+                        for (int k = 0;k<3;k++) rpy(k,0) = fRand<double>(-M_PI,M_PI);
+                        Eigen::Quaterniond q = quaternionFromRPY(rpy);
+                        parameters_[j][0] = q.w();
+                        parameters_[j][1] = q.x();
+                        parameters_[j][2] = q.y();
+                        parameters_[j][3] = q.z();
+                    }
+                    else
+                    {
+                        for (int k = 0;k<N0;k++) parameters_[j][k] = fRand<double>(-M_PI,M_PI);
+                    }
+                }
             }
 
             // Evaluate automatic

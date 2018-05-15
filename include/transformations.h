@@ -33,7 +33,26 @@ template<typename T>
 T quaternionAngle(Eigen::Quaternion<T> q1, Eigen::Quaternion<T> q2)
 {
     /// https://math.stackexchange.com/questions/90081/quaternion-distance
-    return acos(2*pow(q1.dot(q2),2) - 1);
+    return acos(T(2)*pow(q1.dot(q2),2) - T(1));
+}
+
+/*!
+ * \brief Computes the jacobians of the funtion quaternionAngle
+ */
+template <typename T>
+void quaternionAngleJacobian(Eigen::Quaternion<T> q1, Eigen::Quaternion<T> q2, Eigen::Matrix<T,1,4>& J1, Eigen::Matrix<T,1,4>& J2)
+{
+    T k = T(2)*pow(q1.dot(q2),2) - T(1);
+    T k1 = -T(1)/sqrt(T(1)-pow(k,2));
+    T k2 = T(4)*(q1.dot(q2));
+    J1(0,0) = k1*k2*q2.w();
+    J1(0,1) = k1*k2*q2.x();
+    J1(0,2) = k1*k2*q2.y();
+    J1(0,3) = k1*k2*q2.z();
+    J2(0,0) = k1*k2*q1.w();
+    J2(0,1) = k1*k2*q1.x();
+    J2(0,2) = k1*k2*q1.y();
+    J2(0,3) = k1*k2*q1.z();
 }
 
 /*!
@@ -48,6 +67,22 @@ T quaternionDistance(Eigen::Quaternion<T> q1, Eigen::Quaternion<T> q2)
     return T(1) - pow(q1.dot(q2),T(2));
 }
 
+/*!
+ * \brief Computes the jacobians of the funtion quaternionDistance
+ */
+template <typename T>
+void quaternionDistanceJacobian(Eigen::Quaternion<T> q1, Eigen::Quaternion<T> q2, Eigen::Matrix<T,1,4>& J1, Eigen::Matrix<T,1,4>& J2)
+{
+    T k = -2*q1.dot(q2);
+    J1(0,0) = k*q2.w();
+    J1(0,1) = k*q2.x();
+    J1(0,2) = k*q2.y();
+    J1(0,3) = k*q2.z();
+    J2(0,0) = k*q1.w();
+    J2(0,1) = k*q1.x();
+    J2(0,2) = k*q1.y();
+    J2(0,3) = k*q1.z();
+}
 
 /*!
  * \brief Extract roll, pitch and yaw from a given rotation matrix.
@@ -97,6 +132,43 @@ Eigen::Quaternion<T> quaternionFromRPY(Eigen::Matrix<T,3,1> rpy)
 
     // Exit
     return q;
+}
+
+/*!
+ * \brief Computes the Jacobian of the quaternionFromRPY funtion
+ * \param rpy Roll, pitch and yaw angles.
+ * \callgraph
+ * \callergraph
+ */
+template <typename T>
+Eigen::Matrix<T,4,3> quaternionFromRPYJacobian(Eigen::Matrix<T,3,1> rpy)
+{
+    // Compute trigonometries
+    T cr = cos(rpy(0,0)/2);
+    T cp = cos(rpy(1,0)/2);
+    T cy = cos(rpy(2,0)/2);
+    T sr = sin(rpy(0,0)/2);
+    T sp = sin(rpy(1,0)/2);
+    T sy = sin(rpy(2,0)/2);
+
+    // Do jacobian
+    /// Rows 2 and 4 permutated with respect to the wikipedia otherwise it does not match
+    Eigen::Matrix<T,4,3> J;
+    J(0,0) = (-cy*cp*sr + sy*sp*cr)*0.5;
+    J(0,1) = (-cy*sp*cr+sy*cp*sr)*0.5;
+    J(0,2) = (-sy*cp*cr+cy*sp*sr)*0.5;
+    J(1,0) = (cy*cp*cr+sy*sp*sr)*0.5;
+    J(1,1) = (-cy*sp*sr-sy*cp*cr)*0.5;
+    J(1,2) = (-sy*cp*sr-cy*sp*cr)*0.5;
+    J(2,0) = (-cy*sp*sr+sy*cp*cr)*0.5;
+    J(2,1) = (cy*cp*cr-sy*sp*sr)*0.5;
+    J(2,2) = (-sy*sp*cr+cy*cp*sr)*0.5;
+    J(3,0) = (-sy*cp*sr-cy*sp*cr)*0.5;
+    J(3,1) = (-sy*sp*cr-cy*cp*sr)*0.5;
+    J(3,2) = (cy*cp*cr+sy*sp*sr)*0.5;
+
+    return J;
+
 }
 
 /*!
@@ -329,7 +401,7 @@ Eigen::Matrix<T,6,1> inverseCompound3D(const Eigen::Matrix<T,6,1>& x)
 }
 
 /*!
- * \brief Computes the Jacobian (6x6) of the pose x.
+ * \brief Computes the Jacobian (6x6) of the inverse pose x.
  * \callgraph
  * \callergraph
  */
