@@ -93,7 +93,16 @@ void quaternionDistanceJacobian(Eigen::Quaternion<T> q1, Eigen::Quaternion<T> q2
 template<typename T>
 Eigen::Matrix<T,3,1> getRPY(Eigen::Matrix<T,3,3> rot)
 {
-    return rot.eulerAngles(2,1,0).colwise().reverse();
+    /// The following gives roll pitch yaw producing the same rotation matrix but roll and pitch
+    /// are normally not arround 0 but PI
+    /// return rot.eulerAngles(2,1,0).colwise().reverse();
+    /// The following gives roll pitch yaw producing the same rotation matrix but roll and pitch
+    /// are normally not arround PI but 0
+    Eigen::Matrix<T,3,1> rpy;
+    rpy(0,0) = atan2(rot(2,1),rot(2,2));
+    rpy(2,0) = atan2(rot(1,0),rot(0,0));
+    rpy(1,0) = atan2(-rot(2,0),cos(rpy(2,0))*rot(0,0) + sin(rpy(2,0))*rot(1,0));
+    return rpy;
 }
 
 /*!
