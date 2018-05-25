@@ -59,7 +59,7 @@ public:
         jacobians_automatic_ = new double*[parameters_size_.size()];
         jacobians_analytic_ = new double*[parameters_size_.size()];
         jacobians_numeric_ = new double*[parameters_size_.size()];
-        for (int i = 0;i<parameters_size_.size();i++)
+        for (size_t i = 0;i<parameters_size_.size();i++)
         {
             // Parameters
             parameters_[i] = new double[parameters_size_[i]];
@@ -95,7 +95,7 @@ public:
 
     ~Tester()
     {
-        for (int i = 0;i<parameters_size_.size();i++)
+        for (size_t i = 0;i<parameters_size_.size();i++)
         {
             delete[] parameters_[i];
             delete[] jacobians_analytic_[i];
@@ -124,7 +124,7 @@ public:
         for (int i = 0 ;i<iterations;i++)
         {
             // Create random x
-            for (int j = 0;j<parameters_size_.size();j++)
+            for (size_t j = 0;j<parameters_size_.size();j++)
             {
                 if (j == 0)
                 {
@@ -183,7 +183,7 @@ public:
             func_->Evaluate(parameters_,residuals_,jacobians_analytic_);
 
             // Assign jacobians to matrices
-            for(int j = 0;j<parameters_size_.size();j++)
+            for(size_t j = 0;j<parameters_size_.size();j++)
             {
                 for (int k = 0;k<num_residuals*parameters_size_[j];k++)
                 {
@@ -201,7 +201,7 @@ public:
             std::vector<ceres::Matrix> err3;
             std::vector<double> tej3;
             bool berr(false);
-            for (int j = 0;j<parameters_size_.size();j++)
+            for (size_t j = 0;j<parameters_size_.size();j++)
             {
                 ceres::Matrix e = J_analytic_[j] - J_autodiff_[j];
                 ceres::Matrix e2 = J_analytic_[j] - J_numeric_[j];
@@ -242,7 +242,7 @@ public:
             {
                 std::cout<<"++++++++++++++++\nTest "<<i<<std::endl;
                 std::cout<<"Evaluation:\n"<<r_.transpose()<<std::endl;
-                for (int j = 0;j<parameters_size_.size();j++)
+                for (size_t j = 0;j<parameters_size_.size();j++)
                 {
                     if (display == DISPLAY_ERROR_AND_NUMERIC || display == DISPLAY_ALL_AND_NUMERIC)
                     {
@@ -262,7 +262,7 @@ public:
             }
         }
 
-        for (int j = 0;j<parameters_size_.size();j++)
+        for (size_t j = 0;j<parameters_size_.size();j++)
         {
             for (int rw = 0;rw<num_residuals && n_errors > 0;rw++)
             {
