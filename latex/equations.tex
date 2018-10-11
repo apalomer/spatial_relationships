@@ -148,4 +148,39 @@ Second line of $\bm{Q}$:
 	&\frac{\mathrm{d} y}{\mathrm{d} \phi} = \sin \left(\phi\right) \sin \left(\theta\right) \cos \left(\psi\right) - \cos \left(\phi\right) \sin \left(\psi\right)\\
 \end{eqnarray}
 
+\section{Differentiting RPY rotation matrix}
+
+\begin{gather}
+	\bm{R} = \begin{bmatrix}
+		\cos \left(\phi\right) \cos \left(\theta\right) & \cos \left(\phi\right) \sin \left(\theta\right) \sin \left(\psi\right) -\sin \left(\phi\right) \cos \left(\psi\right) & \cos \left(\phi\right) \sin \left(\theta\right) \cos \left(\psi\right) + \sin \left(\phi\right) \sin \left(\psi\right) \\
+		\sin \left(\phi\right) \cos \left(\theta\right) & \sin \left(\phi\right) \sin \left(\theta\right) \sin \left(\psi\right) + \cos \left(\phi\right) \cos \left(\psi\right) & \sin \left(\phi\right) \sin \left(\theta\right) \cos \left(\psi\right) - \cos \left(\phi\right) \sin \left(\psi\right) \\ 
+		-\sin \left(\theta\right) & \cos \left(\theta\right) \sin \left(\psi\right) & \cos \left(\theta\right)  \cos \left(\psi\right)
+	\end{bmatrix}
+\end{gather}
+\begin{gather}
+	\frac{\partial\bm{R}}{\partial \phi} = \left[ \begin{matrix}
+		-\sin \left(\phi\right) \cos \left(\theta\right) & -\left(\sin \left(\phi\right) \sin \left(\theta\right) \sin \left(\psi\right) + \cos \left(\phi\right) \cos \left(\psi\right)\right) \\
+		\cos \left(\phi\right) \cos \left(\theta\right) & \cos \left(\phi\right) \sin \left(\theta\right) \sin \left(\psi\right) - \sin \left(\phi\right) \cos \left(\psi\right) \\ 
+		0 & 0
+	\end{matrix} \right. \nonumber \\
+	\left.  \begin{matrix}
+		-\sin \left(\phi\right) \sin \left(\theta\right) \cos \left(\psi\right) + \cos \left(\phi\right) \sin \left(\psi\right) \\
+		\cos \left(\phi\right) \sin \left(\theta\right) \cos \left(\psi\right) + \sin \left(\phi\right) \sin \left(\psi\right) \\
+		0
+	\end{matrix} \right]
+\end{gather}
+\begin{equation}
+	\frac{\partial\bm{R}}{\partial \theta} = \begin{bmatrix}
+		-\cos \left(\phi\right) \sin \left(\theta\right) & \cos \left(\phi\right) \cos \left(\theta\right) \sin \left(\psi\right) & \cos \left(\phi\right) \cos \left(\theta\right) \cos \left(\psi\right) \\
+		-\sin \left(\phi\right) \sin \left(\theta\right) & \sin \left(\phi\right) \cos \left(\theta\right) \sin \left(\psi\right) & \sin \left(\phi\right) \cos \left(\theta\right) \cos \left(\psi\right) \\ 
+		-\cos \left(\theta\right) & -\sin \left(\theta\right) \sin \left(\psi\right) & -\sin \left(\theta\right)  \cos \left(\psi\right)
+	\end{bmatrix}
+\end{equation}
+\begin{equation}
+	\frac{\partial\bm{R}}{\partial \psi} = \begin{bmatrix}
+		0 & \cos \left(\phi\right) \sin \left(\theta\right) \cos \left(\psi\right) +\sin \left(\phi\right) \sin \left(\psi\right) & -\cos \left(\phi\right) \sin \left(\theta\right) \sin \left(\psi\right) + \sin \left(\phi\right) \cos \left(\psi\right) \\
+		0 & \sin \left(\phi\right) \sin \left(\theta\right) \cos \left(\psi\right) - \cos \left(\phi\right) \sin \left(\psi\right) & -\sin \left(\phi\right) \sin \left(\theta\right) \sin \left(\psi\right) - \cos \left(\phi\right) \cos \left(\psi\right) \\ 
+		0 & \cos \left(\theta\right) \cos \left(\psi\right) & -\cos \left(\theta\right)  \sin \left(\psi\right)
+	\end{bmatrix}
+\end{equation}
 \end{document}
